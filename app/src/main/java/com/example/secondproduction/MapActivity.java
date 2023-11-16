@@ -1,5 +1,4 @@
 package com.example.secondproduction;
-//2023_11_16
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
