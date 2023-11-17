@@ -46,8 +46,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Marker currentMarker = null;
     private static final String TAG = "googlemap";
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
-    private static final int UPDATE_INTERVAL_MS = 1000; // 1초
-    private static final int FASTEST_UPDATE_INTERVAL_MS = 500; // 0.5초
+    private static final int UPDATE_INTERVAL_MS = 60000; // 1초
+    private static final int FASTEST_UPDATE_INTERVAL_MS = 30000; // 0.5초
     // OnRequestPermissionsResultCallback에서 수신된 결과에서 ActivityCompat.OnRequestPermissionsResultCallback를 사용한 퍼미션 요청을 구별하기 위함
     private static final int PERMISSION_REQUEST_CODE = 100;
     boolean needRequest = false;
@@ -188,8 +188,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         markerOptions.snippet(markerSnippet);
         markerOptions.draggable(true);
         // 마커 생성하고, 속성 설정하는 부분
-        currentMarker = mMap.addMarker(markerOptions);
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(currentLatLng);
+        // currentMarker = mMap.addMarker(markerOptions);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(currentLatLng,20);
         mMap.moveCamera(cameraUpdate);
         // 업데이트 된 위치로 카메라 이동
     }
