@@ -340,7 +340,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 Log.d("SHL", document.getId() + document.getData());
                             }
                         } else {
-                            Log.d("SHL", "Error getting documents: ", task.getException());
                         }
                     }
                 });
@@ -372,6 +371,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         Log.e("SHL", "Error loading memos from Firestore", task.getException());
                     }
                 });
+        // ???
     }
 
 
