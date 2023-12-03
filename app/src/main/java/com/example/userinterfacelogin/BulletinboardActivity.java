@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
 import com.example.userinterfacelogin.databinding.ActivityBulletinboardBinding;
@@ -80,7 +81,7 @@ public class BulletinboardActivity extends AppCompatActivity {
             }
         }
         List<Memo> memoList = new ArrayList<>();
-
+        YourAdapter adapter = new YourAdapter(memoList, this);
         for(int i = 0; i < 9; i++) {
             db.collection("MapGrid").document(nearMapGrids[i]).collection("memo")
                     .get()
@@ -95,16 +96,16 @@ public class BulletinboardActivity extends AppCompatActivity {
                                 memoList.add(memo);
                                 Log.d("aaa", "imageurl ", task.getException());
                             }
-
+                            adapter.notifyDataSetChanged();
                         }
                         else {Log.d("BulletinboardActivity", "Error getting memo documents: ", task.getException());}
                     });
         }
         // ViewPager에 어댑터 설정
-        YourAdapter adapter = new YourAdapter(memoList, this);
+
         binding.ViewPager.setAdapter(adapter);
-        LinearLayoutManager linearlayoutmanager = new LinearLayoutManager(this);
-        linearlayoutmanager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        binding.ViewPager.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
+
     }
 
     public class ImageViewHolder extends RecyclerView.ViewHolder {
