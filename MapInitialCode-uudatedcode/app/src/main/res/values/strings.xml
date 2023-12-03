@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">UserInterfaceLogin</string>
+    <string name="default_web_client_id">sshl505</string>
+    <string name="school">[학교]</string>
+    <string name="study">[학습]</string>
+    <string name="just_chating">[잡담]</string>
+</resources>

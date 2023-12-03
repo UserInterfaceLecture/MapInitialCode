@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--초기화면-->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <fragment
+        xmlns:map = "http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        map:uiRotateGestures = "true"
+        map:uiZoomControls="true"
+        map:cameraTilt = "30" />
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/Toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@drawable/memotoolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageButton
+                android:id="@+id/imageButton"
+                android:layout_width="70dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="8dp"
+                android:background="#00000000"
+                android:src="@drawable/profileimage_real"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="24dp"
+                android:text="익명의 숭실인"
+                android:textColor="@color/white"
+                android:textSize="20dp"
+                app:layout_constraintStart_toEndOf="@+id/imageButton"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <FrameLayout
+                android:layout_width="50dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="28dp"
+                android:background="@drawable/memoalarmmenu"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    app:srcCompat="@android:drawable/ic_popup_reminder" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:background="@drawable/circle"
+                    android:gravity="center"
+                    android:maxWidth="30dp"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:text="5"
+                    android:textColor="@color/white"
+                    android:textSize="8dp" />
+
+
+            </FrameLayout>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:maxHeight="10dp"
+        android:background="@drawable/memopreviewmenu2"
+        android:text="메모 작성"
+        android:textSize="15dp"
+        app:layout_constraintBottom_toTopOf="@+id/textView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="@drawable/memopreviewmenu"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:elevation="5dp"
+        android:gravity="center"
+        android:padding="50dp"
+        android:text="사용자 인터페이스는 너무 재밌어!"
+        android:textColor="#F5F5F5"
+        android:textSize="30dp"
+        app:layout_constraintBottom_toTopOf="@id/bottom_linear"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.523"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintVertical_bias="0.798" />
+
+    <LinearLayout
+        android:id="@+id/bottom_linear"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:elevation="5dp"
+        android:gravity="center"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="13"
+            android:background="@drawable/memopreviewmenu2"
+            android:elevation="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1.5"
+                android:background="@drawable/memopreviewmenu2"
+                android:text="234"
+                android:textColor="#000000">
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="5dp"
+                    android:layout_weight="1"
+                    android:maxWidth="26dp"
+                    android:src="@drawable/pngwing" />
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_marginEnd="5dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="234"
+                    android:textColor="#000000" />
+
+            </LinearLayout>
+
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:text="@string/school"
+                android:textColor="#000090"
+
+                />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:text="@string/study"
+                android:textColor="#009000" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:text="@string/just_chating"
+                android:textColor="#900000" />
+
+        </LinearLayout>
+
+
+        <Button
+            android:id="@+id/tobulletinboardactivity"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="5dp"
+            android:layout_weight="6"
+            android:background="@drawable/memopreviewmenu2"
+            android:elevation="10dp"
+            android:text="By 익명의 숭실인"
+            android:textSize="13dp" />
+
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/imageButton7"
+
+        android:layout_width="70dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@null"
+        android:src="@drawable/profileimage_real"
+        app:layout_constraintBottom_toTopOf="@+id/textView"
+        app:layout_constraintStart_toStartOf="@+id/textView"
+
+        />
+
+    <ImageView
+        android:id="@+id/compas"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:srcCompat="@drawable/compas"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="15dp"
+        tools:layout_editor_absoluteX="345dp"
+        tools:layout_editor_absoluteY="94dp"
+        app:layout_constraintTop_toBottomOf="@id/Toolbar"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
