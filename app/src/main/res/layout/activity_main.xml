@@ -12,8 +12,8 @@
         android:layout_height="match_parent"
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
+        map:uiZoomControls = "true"
         map:uiRotateGestures = "true"
-        map:uiZoomControls="true"
         map:cameraTilt = "30" />
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/Toolbar"
@@ -208,6 +208,7 @@
 
 
         <Button
+            android:id="@+id/tobulletinboardactivity"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginStart="5dp"
