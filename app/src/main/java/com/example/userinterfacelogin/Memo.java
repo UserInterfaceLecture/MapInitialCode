@@ -7,6 +7,39 @@ import com.google.firebase.Timestamp;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+class Categories {
+    private static final Map<Integer, String> ID_TO_NAME_MAP = new HashMap<>();
+    private static final Map<String, Integer> NAME_TO_ID_MAP = new HashMap<>();
+
+    static {
+        ID_TO_NAME_MAP.put(0, "---");
+        ID_TO_NAME_MAP.put(1, "여행");
+        ID_TO_NAME_MAP.put(2, "음악");
+        ID_TO_NAME_MAP.put(3, "축제");
+        ID_TO_NAME_MAP.put(4, "공연");
+        ID_TO_NAME_MAP.put(5, "미식");
+
+        // 카테고리 추가 가능
+
+        for (Map.Entry<Integer, String> entry : ID_TO_NAME_MAP.entrySet()) {
+            NAME_TO_ID_MAP.put(entry.getValue(), entry.getKey());
+        }
+    }
+
+    private Categories() {
+    }
+
+    public static String getNameById(int id) {
+        return ID_TO_NAME_MAP.get(id);
+    }
+
+    public static Integer getIdByName(String name) {
+        return NAME_TO_ID_MAP.get(name);
+    }
+}
 
 public class Memo implements Serializable {
     private double latitude;
@@ -20,6 +53,13 @@ public class Memo implements Serializable {
     private int category2;
     private int category3;
     private Timestamp timestamp; // Firestore에 저장할 타임스탬프 필드
+    private String firestorePath; // Firestore에 저장될 경로를 저장할 필드
+    public String getFirestorePath() {
+        return firestorePath;
+    }
+    public void setFirestorePath(String firestorePath) {
+        this.firestorePath = firestorePath;
+    }
 
     public Memo() {
         // Firebase를 위한 기본 생성자

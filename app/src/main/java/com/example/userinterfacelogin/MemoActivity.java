@@ -22,7 +22,9 @@ import androidx.annotation.NonNull;
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 
 import com.example.userinterfacelogin.databinding.ActivityGoogleSignInBinding;
@@ -70,6 +72,7 @@ public class MemoActivity extends AppCompatActivity {
             memoMaking.setLongitude(126.95994559383);
         }
         memoMaking.setMapGrid(memoMaking.mapGridCalculate());
+        memoMaking.setFirestorePath("");
 
         memoMaking.setCategory1(0);
         memoMaking.setCategory2(0);
@@ -126,12 +129,29 @@ public class MemoActivity extends AppCompatActivity {
                         String mapGridCollectionName = String.valueOf(memoMaking.getMapGrid());
                         CollectionReference mapGridCollectionRef = db.collection("MapGrid").document(mapGridCollectionName).collection("memo");
 
-                        userCollectionRef.add(memoMaking)
+                        mapGridCollectionRef.add(memoMaking)
                                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                     @Override
                                     public void onSuccess(DocumentReference documentReference) {
                                         // Memo 정보가 성공적으로 추가됨
-                                        Log.d("MemoActivity", "Memo added with ID: " + documentReference.getId());
+                                        Log.d("MemoActivity", "Memo added with MapGrid: " + documentReference.getId());
+                                        Map<String, Object> updates = new HashMap<>();
+                                        updates.put("firestorePath", "MapGrid/" + mapGridCollectionName + "/memo/" + documentReference.getId());
+                                        documentReference.update(updates)
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        // Firestore 문서 업데이트 성공
+                                                        Log.d("MemoActivity", "Firestore 문서 업데이트 성공: ");
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(Exception e) {
+                                                        // Firestore 문서 업데이트 실패
+                                                        Log.w("MemoActivity", "Firestore 문서 업데이트 실패: ", e);
+                                                    }
+                                                });
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
@@ -142,12 +162,30 @@ public class MemoActivity extends AppCompatActivity {
                                     }
                                 });
 
-                        mapGridCollectionRef.add(memoMaking)
+                        userCollectionRef.add(memoMaking)
                                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                     @Override
                                     public void onSuccess(DocumentReference documentReference) {
                                         // Memo 정보가 성공적으로 추가됨
-                                        Log.d("MemoActivity", "Memo added with MapGrid: " + documentReference.getId());
+                                        Log.d("MemoActivity", "Memo added with ID: " + documentReference.getId());
+                                        Map<String, Object> updates = new HashMap<>();
+                                        updates.put("firestorePath", "UID/" + currentUser.getUid() + "/memo/" + documentReference.getId());
+                                        documentReference.update(updates)
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        // Firestore 문서 업데이트 성공
+                                                        Log.d("MemoActivity", "Firestore 문서 업데이트 성공: " );
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(Exception e) {
+                                                        // Firestore 문서 업데이트 실패
+                                                        Log.w("MemoActivity", "Firestore 문서 업데이트 실패: ", e);
+                                                    }
+                                                });
+
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
@@ -157,6 +195,8 @@ public class MemoActivity extends AppCompatActivity {
                                         Log.w("MemoActivity", "Error adding memo", e);
                                     }
                                 });
+
+
 
 
 
