@@ -2,6 +2,7 @@ package com.example.userinterfacelogin;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.userinterfacelogin.databinding.ActivityBulletinboardBinding;
 import com.example.userinterfacelogin.databinding.NearnoteitemBinding;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -23,12 +23,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BulletinboardActivity extends AppCompatActivity {
+    Memo forCalculate = new Memo();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ActivityBulletinboardBinding binding = ActivityBulletinboardBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        double currentlat = 0;
+        double currentlon = 0;
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            currentlat = extras.getDouble("Latitude");
+            currentlon = extras.getDouble("Longitude");
+
+            // Rest of your code here
+        } else {
+            // Handle the case where extras are null, log an error, show a message, etc.
+            Log.e("BulletinboardActivity", "No extras found");
+
+        }
+        forCalculate.setLatitude(currentlat);
+        forCalculate.setLongitude(currentlon);
+
         binding.backbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -43,81 +60,95 @@ public class BulletinboardActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        binding.settingbutton.setOnClickListener((new View.OnClickListener(){
+        binding.settingbutton.setOnClickListener((new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
-                Intent intent2 = new Intent(getApplicationContext(),SettingActivity.class);
+                Intent intent2 = new Intent(getApplicationContext(), SettingActivity.class);
                 startActivity(intent2);
             }
         }));
 
-        List<String> yourImageList = new ArrayList<>();
-
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        YourAdapter yourAdapter = new YourAdapter(yourImageList, this);
-
-        CollectionReference imagesRef = db.collection("MapGrid");
-        // Firestore 컬렉션 이름
-
-        imagesRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    // Firestore 문서에서 이미지 URL 가져오기
-                    String imageUrl = document.getString("imageUrl");
-                    // RecyclerView에 데이터 추가
-                    yourImageList.add(imageUrl);
-                }
-
-                // RecyclerView 갱신
-                yourAdapter.notifyDataSetChanged();
-            } else {
-                // 처리 중 오류가 발생한 경우
-                Log.d("aaa", "Error getting documents: ", task.getException());
+        long MapgridAttribute = forCalculate.mapGridCalculate();
+        String []nearMapGrids = new String[9];
+        int n = 0;
+        for(int i = -1; i < 2; i++){
+            for (int j = -1; j<2; j++){
+                nearMapGrids[n] = Long.toString(MapgridAttribute + (i * 10000) + j);
+                n++;
             }
-        });
+        }
+        List<Memo> memoList = new ArrayList<>();
+
+        for(int i = 0; i < 9; i++) {
+            db.collection("MapGrid").document(nearMapGrids[i]).collection("memo")
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot memoDocument : task.getResult()) {
+                                // "imageUrl" 필드를 Uri로 가져오기
+                                String imageUrlString = memoDocument.getString("imageUrl");
+                                Uri imageUrl = Uri.parse(imageUrlString);
+                                Memo memo = new Memo();
+                                memo.setImageUrl(imageUrl);
+                                memoList.add(memo);
+                                Log.d("aaa", "imageurl ", task.getException());
+                            }
+
+                        }
+                        else {Log.d("BulletinboardActivity", "Error getting memo documents: ", task.getException());}
+                    });
+        }
+        // ViewPager에 어댑터 설정
+        YourAdapter adapter = new YourAdapter(memoList, this);
+        binding.ViewPager.setAdapter(adapter);
         LinearLayoutManager linearlayoutmanager = new LinearLayoutManager(this);
         linearlayoutmanager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        binding.recyclerView.setLayoutManager(linearlayoutmanager);
-        binding.recyclerView.setAdapter(yourAdapter);
+    }
+
+    public class ImageViewHolder extends RecyclerView.ViewHolder {
+        NearnoteitemBinding imageBinding;
+
+        public ImageViewHolder(NearnoteitemBinding binding) {
+            super(binding.getRoot());
+            imageBinding = binding;
         }
 
-        public class ImageViewHolder extends RecyclerView.ViewHolder {
-            NearnoteitemBinding imageBinding;
-
-            public ImageViewHolder(NearnoteitemBinding binding) {
-                super(binding.getRoot());
-                imageBinding = binding;
-            }
+        public void bind(Memo memo) {
+            // 이미지 로드 및 표시
+            Glide.with(itemView.getContext())
+                    .load(memo.getImageUrl())
+                    .into(imageBinding.getRoot());
         }
-        public class YourAdapter extends RecyclerView.Adapter<ImageViewHolder> {
+    }
 
-            private List<String> imageUrls;
-            private Context context;
+    public class YourAdapter extends RecyclerView.Adapter<ImageViewHolder> {
 
-            public YourAdapter(List<String> imageUrls, Context context) {
-                this.imageUrls = imageUrls;
-                this.context = context;
-            }
+        private List<Memo> memos;
+        private Context context;
 
-            @Override
-            public ImageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                NearnoteitemBinding binding = NearnoteitemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);     //우리가 붙이는 건 아니다. 보통 가져다주면 알아서 붙인다.
-                return new ImageViewHolder(binding);
-            }
+        public YourAdapter(List<Memo> memos, Context context) {
+            this.memos = memos;
+            this.context = context;
+        }
 
-            @Override
-            public void onBindViewHolder(ImageViewHolder holder, int position) {
-            // Glide를 사용하여 이미지 로드 및 표시
-                Glide.with(context)
-                    .load(imageUrls.get(position))
-                    .into(holder.imageBinding.getRoot());
-            }
+        @Override
+        public ImageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            NearnoteitemBinding binding = NearnoteitemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            return new ImageViewHolder(binding);
+        }
 
-            @Override
-            public int getItemCount() {
-                return imageUrls.size();
-            }
+        @Override
+        public void onBindViewHolder(ImageViewHolder holder, int position) {
+            // 데이터를 ViewHolder에 바인딩
+            Memo memo = memos.get(position);
+            holder.bind(memo);
+        }
+
+        @Override
+        public int getItemCount() {
+            return memos.size();
+        }
     }
 }
