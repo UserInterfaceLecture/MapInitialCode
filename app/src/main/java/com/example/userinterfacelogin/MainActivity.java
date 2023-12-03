@@ -33,9 +33,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import com.google.android.gms.location.LocationCallback;
@@ -58,8 +56,6 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -72,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final int FASTEST_UPDATE_INTERVAL_MS = 50000;
     // OnRequestPermissionsResultCallback에서 수신된 결과에서 ActivityCompat.OnRequestPermissionsResultCallback를 사용한 퍼미션 요청을 구별하기 위함
     private static final int PERMISSION_REQUEST_CODE = 100;
-    String[] REQUIRED_PERMISSION = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+    String[] REQUIRED_PERMISSION = {Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION };
     Location mCurrentLocation;
     LatLng mCurrentPosition;
     CircleOptions circleOptions;
@@ -83,7 +79,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FirebaseFirestore db;
     private FirebaseUser currentUser;
     private FirebaseAuth mAuth;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,14 +93,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
         builder.addLocationRequest(locationRequest);
         // addLocationRequest = locationRequest 객체를 추가
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         db = FirebaseFirestore.getInstance();
-        if (currentUser == null) {
-            Intent GetIntoLogin = new Intent(this, GoogleSignInActivity.class);
-            GetIntoLogin.putExtra("source", "GetIntoLogin");
+        if(currentUser == null){
+            Intent GetIntoLogin = new Intent(this,GoogleSignInActivity.class);
+            GetIntoLogin.putExtra("source","GetIntoLogin");
             startActivity(GetIntoLogin);
         }
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -123,9 +118,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onClick(View v) {
                 finish();
                 Intent WantProfile = new Intent(getApplicationContext(), ProfileActivity.class);
-                WantProfile.putExtra("source", "wantProfileFromMain");
+                WantProfile.putExtra("source","wantProfileFromMain");
                 startActivity(WantProfile);
             }
+        });
+        binding.tobulletinboardactivity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { getLocationAndStartActivity2(); }
         });
         binding.compas.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -135,42 +134,36 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         });
-//        binding.textView.setText();
     }
-
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         Log.d(TAG, "onMapReady: 들어옴 ");
         mMap = googleMap;
         requestLocation();
     }
-
-    private BitmapDescriptor getMarkerIconFromColorA(int color,int radius) {
+    public void setCircle(){
+        circleOptions = new CircleOptions()
+                .center(mCurrentPosition)
+                .radius(20) // 반경의 크기 (미터 단위)
+                .strokeWidth(0)
+                .fillColor(ContextCompat.getColor(this,R.color.colorAccentWithT));
+    }
+    private BitmapDescriptor getMarkerIconFromColor(int color) {
         Bitmap bitmap = Bitmap.createBitmap(48, 48, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         Paint paint = new Paint();
         paint.setColor(color);
         paint.setStyle(Paint.Style.FILL);
         paint.setAntiAlias(true);
-        canvas.drawCircle(24, 24, radius, paint);
+        canvas.drawCircle(24, 24, 12, paint);
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
-
-    private void addColoredMarker(LatLng position, int color,int radius) {
-        BitmapDescriptor icon = getMarkerIconFromColorA(color,radius);
-        mMap.addMarker(new MarkerOptions()
+    private Marker addColoredMarker(LatLng position, int color) {
+        BitmapDescriptor icon = getMarkerIconFromColor(color);
+        return mMap.addMarker(new MarkerOptions()
                 .position(position)
                 .icon(icon));
     }
-    private void setCircle(LatLng position,int color){
-        CircleOptions circleOptions = new CircleOptions()
-                .center(position)
-                .radius(150) // 반경의 크기 (미터 단위)
-                .strokeWidth(0)
-                .fillColor(color);
-        mMap.addCircle(circleOptions);
-    }
-
     private LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
@@ -180,16 +173,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 double latitude = locationResult.getLastLocation().getLatitude();
                 double longitude = locationResult.getLastLocation().getLongitude();
                 mCurrentPosition = new LatLng(latitude, longitude);
-                addColoredMarker(mCurrentPosition,
-                        ContextCompat.getColor(MainActivity.this, R.color.colorPrimary),24);
-                setCircle(mCurrentPosition,
-                        ContextCompat.getColor(MainActivity.this, R.color.colorAccent));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPosition, 17f));
+                addColoredMarker(mCurrentPosition,ContextCompat.getColor(MainActivity.this,R.color.colorPrimary));
+                setCircle();
+                mMap.addCircle(circleOptions);
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPosition, 19f));
                 loadMemosNearby(mCurrentPosition);
             }
         }
     };
-
     private void requestLocation() {
         if (checkLocationServicesStatus()) {
             if (checkPermission()) {
@@ -200,7 +191,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     public void onSuccess(Location location) {
                         if (location != null) {
                             handleLocationSuccess(location);
-                        } else {
+                        }
+                        else{
                             setDefaultLocation();
                         }
                     }
@@ -214,22 +206,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             showLocationServiceDialog();
         }
     }
-
     private void handleLocationSuccess(Location location) {
         Log.d("SHL", "성공적으로 수행");
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
         mCurrentPosition = new LatLng(latitude, longitude);
-//        if (mMap != null) {
-//            mMap.clear(); // 맵 상의 모든 마커 및 그래픽 제거
-//        }
-        addColoredMarker(mCurrentPosition,
-                ContextCompat.getColor(MainActivity.this, R.color.colorPrimary),24);
-        setCircle(mCurrentPosition,
-                ContextCompat.getColor(MainActivity.this, R.color.colorAccent));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPosition, 17f));
+        addColoredMarker(mCurrentPosition, ContextCompat.getColor(MainActivity.this, R.color.colorPrimary));
+        setCircle();
+        mMap.addCircle(circleOptions);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentPosition, 19f));
     }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults); // Call the superclass method
@@ -243,11 +229,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
     }
-
     private void showPermissionDeniedSnackbar() {
         Snackbar.make(findViewById(android.R.id.content), "위치 권한이 거부되었습니다.", Snackbar.LENGTH_SHORT).show();
     }
-
     private void showLocationServiceDialog() {
         // 위치 서비스가 비활성화되었을 때 사용자에게 다이얼로그를 표시하는 코드 추가
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -262,43 +246,39 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         builder.setNegativeButton("아니오", null);
         builder.show();
     }
-
     @Override
     protected void onStart() {
         // 사용자가 Activity로 돌아올 때 위치 정보 업데이트가 필요할 수 있음
         super.onStart();
         Log.d(TAG, "onStart: ");
-        if (checkPermission()) {
-            mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
-            if (mMap != null) {
+        if(checkPermission()){
+            mFusedLocationClient.requestLocationUpdates(locationRequest,locationCallback, null);
+            if(mMap!=null){
                 mMap.setMyLocationEnabled(true);
             }
         }
     }
-
     @Override
     protected void onStop() {
         // 사용자의 화면에 더이상 표시되지 않으면 현재 위치에 대한 실시간 업데이트 필요x
         super.onStop();
-        if (mFusedLocationClient != null) {
+        if(mFusedLocationClient != null){
             mFusedLocationClient.removeLocationUpdates(locationCallback);
             // removeLocationUpdates = 위치 업데이트를 수신하지 않도록 설정
         }
     }
-
-    private boolean checkPermission() {
+    private boolean checkPermission(){
         // 런타임 퍼미션 처리와 유사, 함수 서브루틴
         int hasFineLocationPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
         int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
-        if (hasFineLocationPermission != PackageManager.PERMISSION_GRANTED || hasCoarseLocationPermission != PackageManager.PERMISSION_GRANTED) {
+        if(hasFineLocationPermission != PackageManager.PERMISSION_GRANTED|| hasCoarseLocationPermission != PackageManager.PERMISSION_GRANTED ){
             Log.d(TAG, "startLocationUpdates: 퍼미션 없음");
             return false;
 
-        } else {
+        }else{
             return true;
         }
     }
-
     // 현재 장치에서 위치 서비스가 활성화되어 있는지 확인
     private boolean checkLocationServicesStatus() {
         // LocationManager 가져오기
@@ -306,7 +286,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // isProviderEnabled => GPS_PROVIDER(위치기반 GPS 서비스)또는 NETWORK_PROVIDER(네트워크 기반 위치 서비스) 중 하나라도 활성화 되어 있는지 확인
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
-
     // 퍼미션 요청하기 전에 기본 위치로 이동시켜놓는 함수
     private void setDefaultLocation() {
         // 기본 위치
@@ -314,7 +293,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, 15);
         mMap.moveCamera(cameraUpdate);
     }
-
     private void getLocationAndStartActivity() {
         // 위치 퍼미션 확인
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -330,7 +308,29 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 Intent intent = new Intent(MainActivity.this, MemoActivity.class);
                                 intent.putExtra("Latitude", mCurrentLocation.getLatitude());
                                 intent.putExtra("Longitude", mCurrentLocation.getLongitude());
-                                intent.putExtra("source", "WantMemo");
+                                intent.putExtra("source","WantMemo");
+                                startActivity(intent);
+                            }
+                        }
+                    });
+        }
+    }
+    private void getLocationAndStartActivity2() {
+        // 위치 퍼미션 확인
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        } else {
+            mFusedLocationProviderClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            if (location != null) {
+                                mCurrentLocation = location;
+                                //위치정보 담은 인텐트
+                                Intent intent = new Intent(MainActivity.this, BulletinboardActivity.class);
+                                intent.putExtra("Latitude", mCurrentLocation.getLatitude());
+                                intent.putExtra("Longitude", mCurrentLocation.getLongitude());
+                                intent.putExtra("source","WantBulletinboard");
                                 startActivity(intent);
                             }
                         }
@@ -338,48 +338,50 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
     private void loadMemosNearby(LatLng userLocation) {
-        String Uid = currentUser.getUid();
-        double latl = userLocation.latitude;
-        double lonl = userLocation.longitude;
-        Log.d("SHL", "lat and lon = " + latl + " " + lonl);
-        long lat = ((long) (latl * 1000)) % 10000;
-        long lon = ((long) (lonl * 1000)) % 10000;
-        long mapGrid = lat * 10000 + lon;
-        Log.d("SHL", Long.toString(mapGrid));
-        long mapGridMaxlat = mapGrid + 50000;
-        long mapGridMinlat = mapGrid - 50000;
-        for (long i = mapGridMinlat; i <= mapGridMaxlat; i += 10000) {
-            for (long j=i-5;j<=i+5;j++){
-                Log.d("SHL", "current mapGrid " + i);
-                long finalI = j;
-                db.collection("MapGrid").document(Long.toString(j)).collection("memo")
-                        .get()
-                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                Log.d("SHL", finalI + " get into onComplete");
-                                LatLng eachPosition;
-                                if (task.isSuccessful()) {
-                                    if (task.getResult().isEmpty()) {
-                                        Log.d("SHL", "No documents found.");
-                                    } else {
-                                        Log.d("SHL", "Documents found!");
-                                        for (QueryDocumentSnapshot document : task.getResult()) {
-                                            Log.d("SHL", document.getId() + " => " + document.getData());
-                                            Double mlatitude = document.getDouble("latitude");
-                                            Double mlongitude = document.getDouble("longitude");
-                                            eachPosition = new LatLng(mlatitude, mlongitude);
-                                            addColoredMarker(eachPosition, ContextCompat.getColor(MainActivity.this, R.color.black),12);
-                                        }
-                                    }
-                                } else {
-                                    Log.d("SHL", "Error getting documents: ", task.getException());
+        CollectionReference userMemoCollection = db.collection("UID").document(currentUser.getUid()).collection("memo");
+        // 예시로 0.1도 이내의 메모들만 가져오는 쿼리를 수행
+        double range = 0.1;
+        double lat = userLocation.latitude;
+        double lon = userLocation.longitude;
+        Query query = userMemoCollection
+                .whereGreaterThanOrEqualTo("latitude", lat - range)
+                .whereLessThanOrEqualTo("latitude", lat + range)
+                .whereGreaterThanOrEqualTo("longitude", lon - range)
+                .whereLessThanOrEqualTo("longitude", lon + range);
+        query.get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<Memo> memos = new ArrayList<>();
+                        Log.d("SHL","success load memo from firestore.");
+                        for (DocumentSnapshot document : task.getResult()) {
+                            Memo memo = document.toObject(Memo.class);
+                            if (memo != null) {
+                                memos.add(memo);
+                                // 메모의 위치에 마커 추가
+                                if (calculateDistance(lat, lon, memo.getLatitude(), memo.getLongitude()) <= range) {
+                                    memos.add(memo);
+                                    LatLng memoLocation = new LatLng(memo.getLatitude(), memo.getLongitude());
+                                    MarkerOptions markerOptions = new MarkerOptions()
+                                            .position(memoLocation)
+                                            .title(memo.getTextContent());
+                                    Marker marker = mMap.addMarker(markerOptions);
+                                    marker.setTag(memo); // 마커에 메모 정보 연결
                                 }
                             }
-                        });
-            }
-        }
+                        }
+                    } else {
+                        Log.e("SHL", "Error loading memos from Firestore", task.getException());
+                    }
+                });
+    }
+    private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+        final int R = 6371; // 지구의 반지름 (단위: km)
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
     }
 }
-
-
