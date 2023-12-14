@@ -109,7 +109,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="30dp"
                 android:id="@+id/clearCanvasButton"
-                android:drawableTop="@drawable/eraseall"/>
+                android:drawableTop="@drawable/eraser"
+                android:drawablePadding="-7dp"/>
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
