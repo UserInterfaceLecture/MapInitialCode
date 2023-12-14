@@ -100,17 +100,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="30dp"
-                android:id="@+id/toggleEraserButton"/>
+                android:id="@+id/toggleEraserButton"
+                android:drawableLeft="@drawable/penerase"/>
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="30dp"
-                android:id="@+id/clearCanvasButton"/>
+                android:id="@+id/clearCanvasButton"
+                android:drawableLeft="@drawable/eraser"/>
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="30dp"
-                android:id="@+id/changeStrokeWidthButton"/>
+                android:id="@+id/changeStrokeWidthButton"
+                android:drawableLeft="@drawable/large"/>
 
         </LinearLayout>
         <LinearLayout
