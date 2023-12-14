@@ -135,6 +135,11 @@ public class MemoActivity extends AppCompatActivity {
         memoMaking.setMapGrid(memoMaking.mapGridCalculate());
         memoMaking.setFirestorePath("");
 
+        //수정 필요
+        memoMaking.setCategory1(binding.button1.getText().toString());
+        memoMaking.setCategory2(binding.button2.getText().toString());
+        memoMaking.setCategory3(binding.button3.getText().toString());
+
         memoMaking.setLikeCount(0);
         binding.publishButtonOnEditor.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -186,15 +191,6 @@ public class MemoActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         // 확인 버튼 클릭 시 버튼 텍스트 업데이트
                         buttonToUpdate.setText(selectedCategory[buttonNumber - 1]);
-                        if(buttonNumber == 1){
-                            memoMaking.setCategory1(selectedCategory[buttonNumber - 1]);
-                        }
-                        else if(buttonNumber == 2){
-                            memoMaking.setCategory2(selectedCategory[buttonNumber - 1]);
-                        }
-                        else if(buttonNumber == 3){
-                            memoMaking.setCategory3(selectedCategory[buttonNumber - 1]);
-                        }
                     }
                 })
                 .setNegativeButton("취소", new DialogInterface.OnClickListener() {
