@@ -358,15 +358,17 @@
 
                 </LinearLayout>
 
-                <ImageView
-                    android:layout_width="170dp"
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/ViewPager2"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/img_1"
-                    app:layout_constraintBottom_toTopOf="@+id/textView1"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHeight_max="140dp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp">
+
+                </androidx.viewpager2.widget.ViewPager2>
 
                 <TextView
                     android:id="@+id/textView1"
