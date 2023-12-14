@@ -54,6 +54,16 @@ public class Memo implements Serializable {
     private int category3;
     private Timestamp timestamp; // Firestore에 저장할 타임스탬프 필드
     private String firestorePath; // Firestore에 저장될 경로를 저장할 필드
+    private String subPath;
+
+    public void setSubPath(String subPath) {
+        this.subPath = subPath;
+    }
+
+    public String getSubPath() {
+        return subPath;
+    }
+
     public String getFirestorePath() {
         return firestorePath;
     }

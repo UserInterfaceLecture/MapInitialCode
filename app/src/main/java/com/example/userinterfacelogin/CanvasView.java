@@ -6,25 +6,33 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
+import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
+
+import java.util.ArrayList;
+import java.util.List;
 //선 두께 바꿀수 있게하기, 지우개 지원하기
 
+import android.content.Context;
+import android.graphics.*;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.View;
+import java.util.ArrayList;
+import java.util.List;
+
 public class CanvasView extends View {
-    private Paint paint;
-    private Path path;
+    private List<Pair<Path, Paint>> paths; // 그림 경로와 해당 경로의 설정을 저장하는 리스트
     private Bitmap bitmap;
     private Canvas drawCanvas;
+    private float lineWidth = 5; // 초기 선 두께를 5로 설정
+    private int currentColor = Color.BLACK; // 초기 색상을 검정으로 설정
+    private boolean eraseMode = false; // 지우개 모드 설정
 
     public CanvasView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        // 그리기 설정 초기화
-        paint = new Paint();
-        paint.setColor(Color.BLACK); // 그리기 색상
-        paint.setStyle(Paint.Style.STROKE); // 그리기 스타일: 선
-        paint.setStrokeWidth(5); // 선의 두께
-        path = new Path();
-        path.reset();
+        paths = new ArrayList<>();
     }
 
     @Override
@@ -42,6 +50,9 @@ public class CanvasView extends View {
         super.onDraw(canvas);
 
         // 그리기 작업을 Canvas에 그립니다.
+        for (Pair<Path, Paint> pathPair : paths) {
+            canvas.drawPath(pathPair.first, pathPair.second);
+        }
         canvas.drawBitmap(bitmap, 0, 0, null);
     }
 
@@ -69,12 +80,33 @@ public class CanvasView extends View {
     }
 
     public void startDrawing(float x, float y) {
+        Path path = new Path();
+        Paint paint = new Paint();
+
+        paint.setColor(eraseMode ? Color.WHITE : currentColor); // 현재 색상 또는 지우개 모드 설정
+        paint.setStyle(Paint.Style.STROKE); // 그리기 스타일: 선
+        paint.setStrokeWidth(lineWidth); // 현재 선 두께 설정
+
         path.moveTo(x, y);
+        drawCanvas.drawPath(path, paint);
+
+        paths.add(new Pair<>(path, paint));
     }
 
     public void continueDrawing(float x, float y) {
-        path.lineTo(x, y);
-        drawCanvas.drawPath(path, paint);
+        Paint paint = new Paint();
+
+        paint.setColor(eraseMode ? Color.WHITE : currentColor); // 현재 색상 또는 지우개 모드 설정
+        paint.setStyle(Paint.Style.STROKE); // 그리기 스타일: 선
+        paint.setStrokeWidth(lineWidth); // 현재 선 두께 설정
+
+        if (!paths.isEmpty()) {
+            Pair<Path, Paint> lastPathPair = paths.get(paths.size() - 1);
+            Path path = lastPathPair.first;
+            path.lineTo(x, y);
+            drawCanvas.drawPath(path, paint);
+
+        }
     }
 
     public void stopDrawing() {
@@ -84,6 +116,35 @@ public class CanvasView extends View {
     public Bitmap getCanvasBitmap() {
         return bitmap;
     }
+
+    public void setLineWidth(float width) {
+        lineWidth = width;
+    }
+
+    public float getLineWidth() {
+        return lineWidth;
+    }
+
+    public void setCurrentColor(int color) {
+        currentColor = color;
+    }
+
+    public int getCurrentColor() {
+        return currentColor;
+    }
+
+    public void setEraseMode(boolean erase) {
+        eraseMode = erase;
+    }
+
+    public boolean isEraseMode() {
+        return eraseMode;
+    }
+
+    public void clearCanvas() {
+        paths.clear(); // 경로 리스트를 초기화하여 화면을 지웁니다.
+        bitmap.eraseColor(Color.WHITE); // 비트맵을 흰색으로 지우기
+
+        invalidate(); // 뷰 다시 그리기
+    }
 }
-
-

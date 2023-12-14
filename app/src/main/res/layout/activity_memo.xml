@@ -81,11 +81,11 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="27dp"
+            android:layout_height="34dp"
             android:layout_gravity="center"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="8dp"
             android:layout_weight="1.5"
             android:background="@drawable/memopreviewmenu2"
             android:text="234"
@@ -96,24 +96,21 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/canvas_view">
 
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_gravity="center"
-                android:layout_marginStart="5dp"
-                android:layout_weight="1"
-                android:background="@drawable/memopreviewmenu2"
-                android:maxWidth="26dp"
-                android:src="@drawable/pngwing" />
-
-            <TextView
-                android:id="@+id/text_up"
-                android:layout_width="269dp"
-                android:layout_height="27dp"
-                android:layout_gravity="center"
-                android:layout_weight="2"
-                android:gravity="center"
-                android:text="2023 / 11 / 16" />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:id="@+id/toggleEraserButton"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:id="@+id/clearCanvasButton"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:id="@+id/changeStrokeWidthButton"/>
 
         </LinearLayout>
         <EditText
@@ -123,6 +120,7 @@
             app:layout_constraintTop_toBottomOf="@+id/linear_center"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
+            android:layout_marginTop="8dp"
             android:hint="Write Content Here..."
             ></EditText>
         <LinearLayout
