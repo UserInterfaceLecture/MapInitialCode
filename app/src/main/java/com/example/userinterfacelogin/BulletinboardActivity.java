@@ -81,7 +81,9 @@ public class BulletinboardActivity extends AppCompatActivity {
             }
         }
         List<Memo> memoList = new ArrayList<>();
+        List<Memo> memoList2 = new ArrayList<>();
         YourAdapter adapter = new YourAdapter(memoList, this);
+        YourAdapter adapter2 = new YourAdapter(memoList2, this);
         for(int i = 0; i < 9; i++) {
             db.collection("MapGrid").document(nearMapGrids[i]).collection("memo")
                     .get()
@@ -102,7 +104,41 @@ public class BulletinboardActivity extends AppCompatActivity {
                     });
         }
         // ViewPager에 어댑터 설정
+        CountDownLatch countDownLatch = new CountDownLatch(9); // 9번의 비동기 요청이 모두 완료될 때까지 대기
 
+        for (int i = 0; i < 9; i++) {
+            db.collection("MapGrid").document(nearMapGrids[i]).collection("memo")
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot memoDocument : task.getResult()) {
+                                Memo memo = memoDocument.toObject(Memo.class);
+                                memoList2.add(memo);
+                            }
+                        } else {
+                            Log.d("BulletinboardActivity", "Error getting memo documents: ", task.getException());
+                        }
+                        countDownLatch.countDown(); // 비동기 요청이 완료되었음을 알림
+                    });
+        }
+
+        try {
+            countDownLatch.await(); // 모든 비동기 요청이 완료될 때까지 대기
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+// 모든 메모가 추가된 memoList를 원하는 기준으로 정렬
+        Collections.sort(memoList, new Comparator<Memo>() {
+            @Override
+            public int compare(Memo o1, Memo o2) {
+                // 원하는 정렬 기준으로 비교
+                return Integer.compare(o2.getLikeCount(), o1.getLikeCount());
+            }
+        });
+
+// 여기서 adapter 등을 사용하여 UI 업데이트
+        adapter2.notifyDataSetChanged();
         binding.ViewPager.setAdapter(adapter);
         binding.ViewPager.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
 
