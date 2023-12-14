@@ -99,18 +99,23 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:maxHeight="34dp"
                 android:layout_marginStart="30dp"
-                android:id="@+id/toggleEraserButton"/>
+                android:id="@+id/toggleEraserButton"
+                android:drawableTop="@drawable/penerase_cus"
+                />
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="30dp"
-                android:id="@+id/clearCanvasButton"/>
+                android:id="@+id/clearCanvasButton"
+                android:drawableTop="@drawable/eraseall"/>
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="30dp"
-                android:id="@+id/changeStrokeWidthButton"/>
+                android:id="@+id/changeStrokeWidthButton"
+                android:drawableTop="@drawable/large_cus"/>
 
         </LinearLayout>
         <LinearLayout
