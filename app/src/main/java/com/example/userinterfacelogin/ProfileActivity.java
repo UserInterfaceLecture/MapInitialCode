@@ -10,27 +10,28 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ActivityProfileBinding binding = ActivityProfileBinding.inflate(getLayoutInflater());
-        setSupportActionBar(binding.Toolbar2);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(binding.getRoot());
-    }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case android.R.id.home:{ //toolbar의 back키 눌렀을 때 동작
+        binding.backbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 finish();
-                String source = getIntent().getStringExtra("source");
-                if ("wantProfileFromMain".equals(source)) {
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(intent);
-                }
-                else if("wantProfileFromSetting".equals(source)){
-                    Intent intent = new Intent(getApplicationContext(), SettingActivity.class);
-                    startActivity(intent);
-                }
-                return true;
             }
-        }
-        return super.onOptionsItemSelected(item);
+        });
+        binding.homebutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+            }
+        });
+        binding.settingbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+                Intent intent2 = new Intent(getApplicationContext(), SettingActivity.class);
+                startActivity(intent2);
+            }
+        });
     }
 }
