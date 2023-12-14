@@ -131,6 +131,53 @@ public class GoogleSignInActivity extends AppCompatActivity  {
                             Log.d(TAG, "createUserWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
                             updateUI(user);
+
+                            FirebaseFirestore db = FirebaseFirestore.getInstance();
+                            String uid = user.getUid(); // 현재 사용자의 UID 가져오기
+
+                            DocumentReference profileDocRef = db.collection("UID").document(uid).collection("profile").document("profile");
+
+                            profileDocRef.get()
+                                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                            if (!documentSnapshot.exists()) {
+                                                // 프로필 문서가 존재하지 않는 경우, 기본 프로필 생성
+                                                Map<String, Object> defaultProfile = new HashMap<>();
+                                                defaultProfile.put("UID", uid); // UID 저장
+                                                defaultProfile.put("likes", 0); // 좋아요 수 초기화
+                                                defaultProfile.put("notes", 0); // 노트 수 초기화
+                                                defaultProfile.put("profilePictureUri", ""); // 프로필 사진 URI 초기화
+                                                defaultProfile.put("nickname", "익명의 숭실인"); // 닉네임 초기화
+
+                                                profileDocRef.set(defaultProfile)
+                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+                                                                // 기본 프로필 생성 성공
+                                                                Log.d("LoginActivity", "기본 프로필 생성 성공");
+                                                            }
+                                                        })
+                                                        .addOnFailureListener(new OnFailureListener() {
+                                                            @Override
+                                                            public void onFailure(Exception e) {
+                                                                // 기본 프로필 생성 실패
+                                                                Log.w("LoginActivity", "기본 프로필 생성 실패", e);
+                                                            }
+                                                        });
+                                            } else {
+                                                // 프로필 문서가 이미 존재하는 경우, 아무 작업도 하지 않음
+                                                Log.d("LoginActivity", "프로필 문서 이미 존재");
+                                            }
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(Exception e) {
+                                            // 프로필 문서 확인 실패
+                                            Log.w("LoginActivity", "프로필 문서 확인 실패", e);
+                                        }
+                                    });
                         } else {
                             // If sign in fails, display a message to the user.
                             //Log.w(TAG, "createUserWithEmail:failure", task.getException());

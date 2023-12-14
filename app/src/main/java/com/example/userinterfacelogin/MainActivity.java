@@ -118,14 +118,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             nickname = documentSnapshot.getString("nickname");
                             if (nickname != null) {
                                 Log.d("LoginActivity", "사용자 닉네임: " + nickname);
+                                binding.mainNickname.setText(nickname);
                             } else {
                                 Log.d("LoginActivity", "닉네임이 설정되지 않았습니다.");
                                 nickname = "익명의 숭실인";
+                                binding.mainNickname.setText(nickname);
                             }
                         } else {
                             // 프로필 문서가 존재하지 않는 경우
                             Log.d("LoginActivity", "프로필 문서가 존재하지 않습니다.");
                             nickname = "Guest";
+                            binding.mainNickname.setText(nickname);
                         }
                     }
                 })
@@ -135,10 +138,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         // 프로필 문서 확인 실패
                         Log.w("LoginActivity", "프로필 문서 확인 실패", e);
                         nickname = "Guest";
+                        binding.mainNickname.setText(nickname);
                     }
                 });
-
-        binding.mainNickname.setText(nickname);
 
         if(currentUser == null){
             Intent GetIntoLogin = new Intent(this,GoogleSignInActivity.class);
