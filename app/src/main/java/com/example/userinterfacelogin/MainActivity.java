@@ -35,6 +35,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import com.google.android.gms.location.LocationCallback;
@@ -54,6 +55,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -62,8 +64,11 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback {
     private GoogleMap mMap;
     private static final String TAG = "googlemap";
@@ -82,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FirebaseFirestore db;
     private FirebaseUser currentUser;
     private FirebaseAuth mAuth;
+    private String nickname;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,6 +107,39 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         db = FirebaseFirestore.getInstance();
+        String uid = currentUser.getUid();
+
+        DocumentReference profileDocRef = db.collection("UID").document(uid).collection("profile").document("profile");
+        profileDocRef.get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        if (documentSnapshot.exists()) {
+                            nickname = documentSnapshot.getString("nickname");
+                            if (nickname != null) {
+                                Log.d("LoginActivity", "사용자 닉네임: " + nickname);
+                            } else {
+                                Log.d("LoginActivity", "닉네임이 설정되지 않았습니다.");
+                                nickname = "익명의 숭실인";
+                            }
+                        } else {
+                            // 프로필 문서가 존재하지 않는 경우
+                            Log.d("LoginActivity", "프로필 문서가 존재하지 않습니다.");
+                            nickname = "Guest";
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(Exception e) {
+                        // 프로필 문서 확인 실패
+                        Log.w("LoginActivity", "프로필 문서 확인 실패", e);
+                        nickname = "Guest";
+                    }
+                });
+
+        binding.mainNickname.setText(nickname);
+
         if(currentUser == null){
             Intent GetIntoLogin = new Intent(this,GoogleSignInActivity.class);
             GetIntoLogin.putExtra("source","GetIntoLogin");

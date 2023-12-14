@@ -43,6 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="24dp"
+                android:id="@+id/main_nickname"
                 android:text="익명의 숭실인"
                 android:textColor="@color/white"
                 android:textSize="20dp"
