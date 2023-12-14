@@ -1,11 +1,15 @@
 package com.example.userinterfacelogin;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.firestore.DocumentReference;
+
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -21,8 +25,10 @@ import java.io.ByteArrayOutputStream;
 import androidx.annotation.NonNull;
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -36,6 +42,8 @@ public class MemoActivity extends AppCompatActivity {
     private Memo memoMaking;
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
+    private List<String> selectedCategories = new ArrayList<>(); // 선택된 카테고리를 저장할 리스트
+    private String[] selectedCategory = new String[]{"","",""};
     String subPathID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +80,30 @@ public class MemoActivity extends AppCompatActivity {
             }
         });
 
+
+            // 버튼 클릭 시 카테고리 다이얼로그 표시
+        binding.button1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showCategoryDialog(1, binding.button1);
+            }
+        });
+        binding.button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showCategoryDialog(2, binding.button2);
+            }
+        });
+        binding.button3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showCategoryDialog(3, binding.button3);
+            }
+        });
+
+
+
+
         Bundle extras = getIntent().getExtras();
 
 
@@ -103,9 +135,10 @@ public class MemoActivity extends AppCompatActivity {
         memoMaking.setMapGrid(memoMaking.mapGridCalculate());
         memoMaking.setFirestorePath("");
 
-        memoMaking.setCategory1(0);
-        memoMaking.setCategory2(0);
-        memoMaking.setCategory3(0);
+        //수정 필요
+        memoMaking.setCategory1(binding.button1.getText().toString());
+        memoMaking.setCategory2(binding.button2.getText().toString());
+        memoMaking.setCategory3(binding.button3.getText().toString());
 
         memoMaking.setLikeCount(0);
         binding.publishButtonOnEditor.setOnClickListener(new View.OnClickListener() {
@@ -120,6 +153,59 @@ public class MemoActivity extends AppCompatActivity {
         });
         //노트 에디터
     }
+    private void showCategoryDialog(final int buttonNumber, final Button buttonToUpdate) {
+        final List<String> categories = new ArrayList<>(Categories.getIdToNameMap().values());
+        for (int i = 0; i < 3; i++) {
+            if (i == (buttonNumber - 1)) {
+                continue; // 현재 버튼은 제외하고 다음으로 넘깁니다.
+            }
+
+            String itemToRemove = selectedCategory[i];
+            if (!itemToRemove.equals("없음") && !itemToRemove.isEmpty()) {
+                categories.remove(itemToRemove);
+            }
+        }
+        // 이전에 선택한 카테고리를 체크된 상태로 표시
+        final boolean[] checkedCategories = new boolean[categories.size()];
+        for (int i = 0; i < categories.size(); i++) {
+            String category = categories.get(i);
+            checkedCategories[i] = selectedCategories.contains(category);
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("카테고리 선택")
+                .setSingleChoiceItems(categories.toArray(new CharSequence[0]), -1, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String selectedCategoryG = categories.get(which);
+                        if (!selectedCategories.contains(selectedCategoryG)) {
+                            selectedCategories.clear(); // 이미 선택한 카테고리 초기화
+                            selectedCategories.add(selectedCategoryG);
+                            selectedCategory[buttonNumber - 1] = selectedCategoryG;
+                            checkedCategories[which] = true; // 선택한 카테고리 체크 상태로 변경
+                        }
+                    }
+                })
+                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // 확인 버튼 클릭 시 버튼 텍스트 업데이트
+                        buttonToUpdate.setText(selectedCategory[buttonNumber - 1]);
+                    }
+                })
+                .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        selectedCategory[buttonNumber - 1] = "없음";
+                        dialog.dismiss();
+                    }
+                });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+
     public void uploadImage(Bitmap bitmap, String userId) {
         // Firebase Storage 인스턴스 가져오기
         FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -238,4 +324,6 @@ public class MemoActivity extends AppCompatActivity {
             }
         });
     }
+
+
 }
